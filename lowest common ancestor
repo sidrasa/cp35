@@ -1,0 +1,56 @@
+int N, Q, T = 1;
+int depth[200005];
+int up[200005][20];
+vi adj[200005];
+
+void dfs(int v) {
+	FOR(i, 1, 20) {
+		up[v][i] = up[up[v][i-1]][i-1];
+	}
+
+	for(int x : adj[v]) {
+		if(x != up[v][0]) {
+			depth[x] = depth[up[x][0] = v]+1;
+			dfs(x);
+		}
+	}
+}
+
+int jump(int x, int d) {
+	F0R(i, 20) {
+		if((d >> i) & 1)
+			x = up[x][i];
+	}
+	return x;
+}
+
+int LCA(int a, int b) {
+	if(depth[a] < depth[b]) swap(a, b);
+
+	a = jump(a, depth[a] - depth[b]);
+	if(a == b) return a;
+
+	R0F(i, 20) {
+		int aT = up[a][i], bT = up[b][i];
+		if(aT != bT) a = aT, b = bT;
+	}
+
+	return up[a][0];
+}
+
+int main() {
+	re(N, Q);
+
+	rep(N-1) {
+		int b; re(b); --b;
+		adj[b].pb(i+1);
+	}
+
+	up[0][0] = 0, depth[0] = 0;
+	dfs(0);
+
+	rep(Q) {
+		int a, b; re(a, b); --a; --b;
+		ps(LCA(a, b)+1);
+	}
+}
